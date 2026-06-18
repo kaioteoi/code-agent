@@ -37,10 +37,9 @@ provider "mgc" {
   api_key = var.api_key   # or env var: MGC_API_KEY
   region  = var.region    # or env var: MGC_REGION
 
-  # Optional:
-  # env           = "prod"         # prod | pre-prod | dev-qa (default: prod)
-  # key_pair_id   = var.kp_id      # Object Storage key pair
-  # key_pair_secret = var.kp_secret
+  # Required for Object Storage operations (omit if not using Object Storage):
+  key_pair_id     = var.mgc_key_pair_id     # distinct from api_key; only issued when OS scopes selected
+  key_pair_secret = var.mgc_key_pair_secret
 }
 ```
 
@@ -190,7 +189,7 @@ resource "mgc_kubernetes_nodepool" "workers" {
 
 1. **Wrong resource names** — The old `mgc_block-storage_volumes` syntax (with hyphens) was deprecated. Current: `mgc_block_storage_volume`.
 2. **AZ mismatch** — Block storage volumes fail to attach if they're in a different AZ from the VM.
-3. **Object Storage auth** — Requires `key_pair_id` + `key_pair_secret` in provider config, NOT just `api_key`.
+3. **Object Storage auth** — Object Storage operations require `key_pair_id` + `key_pair_secret` in the provider config, in addition to `api_key`. This key pair is a separate credential (not derived from `api_key`) and is only issued by Magalu Cloud when the API key is created with Object Storage scopes selected.
 4. **Credentials in code** — Warn users to use env vars (`MGC_API_KEY`, `MGC_REGION`) or variables with `sensitive = true`, never hardcode.
 5. **VPC networking order** — Interface creation depends on subnet existing; always use `depends_on = [mgc_network_vpcs_subnets.xxx]` or implicit references.
 6. **State file** — Always recommend remote state (MGC Object Storage with S3 backend) for team use.
