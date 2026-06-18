@@ -147,15 +147,24 @@ resource "mgc_block_storage_attachment" "attach" {
 
 ```hcl
 terraform {
+  required_providers {
+    mgc = {
+      source = "magalucloud/mgc"
+    }
+  }
   backend "s3" {
-    bucket                      = "my-tfstate-bucket"
-    key                         = "prod/terraform.tfstate"
-    region                      = "br-se1"
-    endpoint                    = "https://br-se1.magaluobjects.com"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
+    bucket                      = "your-bucket-name"
+    key                         = "terraform.tfstate"
+    secret_key                  = "your-secret-key"
+    access_key                  = "your-access-key"
+    region                      = "your-region"
     skip_region_validation      = true
-    force_path_style            = true
+    skip_credentials_validation = true
+    skip_requesting_account_id  = true
+    skip_s3_checksum            = true
+    endpoints = {
+      s3 = "https://your-region.magaluobjects.com/"
+    }
   }
 }
 ```
